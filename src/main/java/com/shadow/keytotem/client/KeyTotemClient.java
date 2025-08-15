@@ -1,5 +1,6 @@
 package com.shadow.keytotem.client;
 
+import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -48,50 +49,38 @@ public class KeyTotemClient implements ClientModInitializer {
         if (totemSlot != -1) {
             moveTotem(client, totemSlot);
         }
-        // Silently fails if no totem is found
     }
 
     private int findTotemSlot(PlayerInventory inventory) {
-        // Search hotbar first (slots 0-8)
         for (int i = 0; i < 9; i++) {
             if (inventory.getStack(i).isOf(Items.TOTEM_OF_UNDYING)) {
                 return i;
             }
         }
-
-        // Then search main inventory (slots 9-35)
         for (int i = 9; i < 36; i++) {
             if (inventory.getStack(i).isOf(Items.TOTEM_OF_UNDYING)) {
                 return i;
             }
         }
-
         return -1;
     }
 
     /**
      * Sends a ClickSlotC2SPacket to the server to swap an inventory item with the offhand.
-     * This method is updated for Minecraft 1.21.5 compatibility.
+     * This method has been UPDATED for Minecraft 1.21.5 and modern Fabric API.
      */
     private void moveTotem(MinecraftClient client, int totemInventorySlot) {
         ClientPlayerEntity player = client.player;
         if (player == null || client.getNetworkHandler() == null) return;
 
         PlayerScreenHandler screenHandler = player.playerScreenHandler;
-
-        // Convert inventory slot to the correct packet slot index.
-        // Hotbar (0-8) -> Packet (36-44)
-        // Main Inv (9-35) -> Packet (9-35)
         int packetSlot = totemInventorySlot < 9 ? totemInventorySlot + 36 : totemInventorySlot;
-
-        // For SlotActionType.SWAP, the 'button' argument is the target slot.
-        // Hotbar buttons are 0-8, and the offhand button is 40.
         final int OFFHAND_BUTTON = 40;
 
-        // The ClickSlotC2SPacket constructor for MC 1.21+ requires an ItemStackHash.
+        // The new packet constructor requires an ItemStackHash of the item on the cursor.
         ItemStackHash carriedStackHash = ItemStackHash.fromItemStack(
-                screenHandler.getCursorStack(), // The item on the cursor (should be empty)
-                client.getNetworkHandler().getComponentHasher()
+                screenHandler.getCursorStack(),
+                screenHandler.getComponentHasher() // The hasher is on the screen handler now
         );
 
         ClickSlotC2SPacket packet = new ClickSlotC2SPacket(
@@ -100,7 +89,7 @@ public class KeyTotemClient implements ClientModInitializer {
                 packetSlot,
                 OFFHAND_BUTTON,
                 SlotActionType.SWAP,
-                screenHandler.getTrackedSlots(), // A map of slots that have changed
+                new Int2ObjectOpenHashMap<>(), // The new constructor takes a map of changed slots
                 carriedStackHash
         );
 
