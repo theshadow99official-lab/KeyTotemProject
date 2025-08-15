@@ -6,7 +6,7 @@ plugins {
 version = project.mod_version
 group = project.maven_group
 
-// Add the Fabric repository for dependencies like Fabric API
+// This block is ESSENTIAL for downloading Fabric API
 repositories {
 	maven {
 		url 'https://maven.fabricmc.net/'
@@ -14,7 +14,6 @@ repositories {
 }
 
 dependencies {
-	// To change the versions see the gradle.properties file
 	minecraft "com.mojang:minecraft:${project.minecraft_version}"
 	mappings "net.fabricmc:yarn:${project.yarn_mappings}:v2"
 	modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
@@ -27,7 +26,6 @@ base {
 
 processResources {
 	inputs.property "version", project.version
-
 	filesMatching("fabric.mod.json") {
 		expand "version": project.version
 	}
@@ -49,16 +47,13 @@ jar {
 	}
 }
 
-// configure the maven publication
 publishing {
 	publications {
 		mavenJava(MavenPublication) {
 			from components.java
 		}
 	}
-
-	// This is a separate repositories block for publishing, not for dependencies
 	repositories {
-		// Add repositories to publish to here.
+		// Repositories to publish to go here
 	}
 }
