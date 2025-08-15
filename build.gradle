@@ -48,5 +48,9 @@ publishing {
 			from components.java
 		}
 	}
-	repositories {}
-}
+	repositories {
+	// The Fabric maven repository is required for the Fabric API.
+	maven {
+		url 'https://maven.fabricmc.net/'
+	}
+	}
