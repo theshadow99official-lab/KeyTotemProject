@@ -65,10 +65,6 @@ public class KeyTotemClient implements ClientModInitializer {
         return -1;
     }
 
-    /**
-     * Sends a ClickSlotC2SPacket to the server to swap an inventory item with the offhand.
-     * This method has been UPDATED for Minecraft 1.21.5 and modern Fabric API.
-     */
     private void moveTotem(MinecraftClient client, int totemInventorySlot) {
         ClientPlayerEntity player = client.player;
         if (player == null || client.getNetworkHandler() == null) return;
@@ -77,19 +73,19 @@ public class KeyTotemClient implements ClientModInitializer {
         int packetSlot = totemInventorySlot < 9 ? totemInventorySlot + 36 : totemInventorySlot;
         final int OFFHAND_BUTTON = 40;
 
-        // The new packet constructor requires an ItemStackHash of the item on the cursor.
+        // CORRECTED: The method is getComponentChangesHash()
         ItemStackHash carriedStackHash = ItemStackHash.fromItemStack(
                 screenHandler.getCursorStack(),
-                screenHandler.getComponentHasher() // The hasher is on the screen handler now
+                screenHandler.getComponentChangesHash()
         );
 
         ClickSlotC2SPacket packet = new ClickSlotC2SPacket(
                 screenHandler.syncId,
                 screenHandler.getRevision(),
-                packetSlot,
+                (short) packetSlot, // CORRECTED: Explicitly cast the int to a short
                 OFFHAND_BUTTON,
                 SlotActionType.SWAP,
-                new Int2ObjectOpenHashMap<>(), // The new constructor takes a map of changed slots
+                new Int2ObjectOpenHashMap<>(),
                 carriedStackHash
         );
 
