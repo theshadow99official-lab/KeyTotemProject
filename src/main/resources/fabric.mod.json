@@ -1,0 +1,27 @@
+{
+  "schemaVersion": 1,
+  "id": "keytotem",
+  "version": "${version}",
+  "name": "KeyTotem",
+  "description": "Allows a player to instantly move a Totem of Undying into their offhand with a keybind.",
+  "authors": [
+    "Shadow"
+  ],
+  "contact": {},
+  "license": "MIT",
+  "icon": "assets/keytotem/icon.png",
+  "environment": "client",
+  "entrypoints": {
+    "client": [
+      "com.shadow.keytotem.client.KeyTotemClient"
+    ]
+  },
+  "mixins": [
+    "keytotem.mixins.json"
+  ],
+  "depends": {
+    "fabricloader": ">=0.15.11",
+    "fabric-api": "*",
+    "minecraft": "1.21.5"
+  }
+}
