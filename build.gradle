@@ -54,6 +54,10 @@ publishing {
 		}
 	}
 	repositories {
-		// Repositories to publish to go here
+	// Add the Fabric repository for Fabric API
+	maven {
+		url 'https://maven.fabricmc.net/'
 	}
+	// Add Maven Central for other standard libraries
+	mavenCentral()
 }
