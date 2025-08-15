@@ -1,0 +1,66 @@
+# Name of the GitHub Actions workflow
+name: Build KeyTotem Mod
+
+# Controls when the workflow will run
+on:
+  # Triggers the workflow on push events for the "main" branch
+  push:
+    branches: [ "main" ]
+  # Triggers the workflow on pull request events targeting the "main" branch
+  pull_request:
+    branches: [ "main" ]
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  # The "build" job is responsible for building the mod
+  build:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+
+    # A sequence of tasks that will be executed as part of the job
+    steps:
+      # Step 1: Check out your repository code
+      # This downloads your code into the runner so the workflow can access it.
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      # Step 2: Set up the correct Java Development Kit (JDK) version
+      # The project is configured for Java 21.
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin' # A popular, reliable distribution of OpenJDK
+
+      # Step 3: Set up Gradle caching
+      # This step caches Gradle dependencies to speed up subsequent builds significantly.
+      # The build will be slow the first time, then much faster on all future runs.
+      - name: Configure Gradle Caching
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+
+      # Step 4: Make the Gradle wrapper executable
+      # Just like in Termux, the gradlew script needs permission to run.
+      - name: Make gradlew executable
+        run: chmod +x ./gradlew
+
+      # Step 5: Build the mod using the Gradle wrapper
+      # This is the main command that compiles the code and creates the JAR file.
+      - name: Build with Gradle
+        run: ./gradlew build
+
+      # Step 6: Upload the built JAR file as an artifact
+      # This takes the JAR file from the build output and makes it available for download.
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          # The name of the artifact to be uploaded (this is what the download will be called)
+          name: KeyTotem-JAR
+          # The path to the file(s) to upload. The wildcard (*) finds the JAR regardless of its version number.
+          path: build/libs/*.jar
