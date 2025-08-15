@@ -6,11 +6,12 @@ plugins {
 version = project.mod_version
 group = project.maven_group
 
-// This block is ESSENTIAL for downloading Fabric API
+// This block is ESSENTIAL for downloading Fabric API and its dependencies
 repositories {
 	maven {
 		url 'https://maven.fabricmc.net/'
 	}
+	mavenCentral()
 }
 
 dependencies {
@@ -26,6 +27,7 @@ base {
 
 processResources {
 	inputs.property "version", project.version
+
 	filesMatching("fabric.mod.json") {
 		expand "version": project.version
 	}
@@ -54,10 +56,5 @@ publishing {
 		}
 	}
 	repositories {
-	// Add the Fabric repository for Fabric API
-	maven {
-		url 'https://maven.fabricmc.net/'
 	}
-	// Add Maven Central for other standard libraries
-	mavenCentral()
 }
